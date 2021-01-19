@@ -3,7 +3,9 @@ Traefik (in Docker) role for Ansible
 
 #### Dependencies
 
-- Assumes Docker and Docker Compose are installed on the host
+- docker is installed on host
+- docker-compose is installed on host
+- `community.general` ansible collection is installed
 
 #### Usage
 
