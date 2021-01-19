@@ -16,7 +16,7 @@ services:
       - "--certificatesResolvers.{{ traefik_cert_resolver_provider }}.acme.dnsChallenge.provider={{ traefik_cert_resolver_provider }}"
       - "--certificatesResolvers.{{ traefik_cert_resolver_provider }}.acme.dnsChallenge.delayBeforeCheck=0"
       - "--certificatesResolvers.{{ traefik_cert_resolver_provider }}.acme.dnsChallenge.resolvers={{ traefik_cert_resolver_dns_resolver }}"
-{% endi %}
+{% endif %}
     environment:
 {% for value in traefik_environment %}
       - {{ value }}
