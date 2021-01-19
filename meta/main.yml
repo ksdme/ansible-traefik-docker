@@ -1,0 +1,9 @@
+---
+galaxy_info:
+  role_name: ansible-traefik-docker
+  description: Ansible role to deploy traefik with docker.
+
+  author: myth
+  license: MIT
+
+  min_ansible_version: 2.2
