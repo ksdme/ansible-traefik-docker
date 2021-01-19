@@ -5,7 +5,7 @@ traefik_directory: "/opt/traefik"
 
 # General settings
 traefik_domain: "mydomain.org"
-traefik_log_level: "WARNING"
+traefik_log_level: "INFO"
 traefik_accesslog_enable: false
 
 # Main configuration
@@ -27,3 +27,6 @@ traefik_docker_expose_by_default: false
 # Enable automatic certificates from Let's Encrypt
 traefik_acme_enable: true
 traefik_acme_email: "admin@mydomain.org"
+traefik_cert_resolver_provider: "cloudflare"
+traefik_cert_resolver_dns_resolver: "1.1.1.1:53,8.8.8.8:53"
+traefik_environment: []

@@ -1,10 +1,4 @@
 ---
-- name: Render traefik config
-  template:
-    src: traefik.toml.j2
-    dest: "{{ traefik_directory }}/traefik.toml"
-  notify: restart traefik
-
 - name: Render docker-compose config
   template:
     src: docker-compose.yml.j2
@@ -29,7 +23,7 @@
     name: "{{ traefik_docker_network }}"
     state: present
 
-- name: Pull Docker image
+- name: Pull docker image
   community.general.docker_image:
     name: traefik
     source: pull

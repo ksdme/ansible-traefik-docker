@@ -5,6 +5,22 @@ services:
   traefik:
     image: traefik:{{ traefik_version }}
     restart: unless-stopped
+    command:
+      - "--providers.docker=true"
+      - "--entrypoints.http.address=:80"
+      - "--entrypoints.https.address=:443"
+      - "--providers.docker.exposedbydefault=false"
+{% if traefik_acme_enable %}
+      - "--certificatesResolvers.{{ traefik_cert_resolver_provider }}.acme.storage=/acme.json"
+      - "--certificatesResolvers.{{ traefik_cert_resolver_provider }}.acme.email={{ traefik_acme_email }}"
+      - "--certificatesResolvers.{{ traefik_cert_resolver_provider }}.acme.dnsChallenge.provider={{ traefik_cert_resolver_provider }}"
+      - "--certificatesResolvers.{{ traefik_cert_resolver_provider }}.acme.dnsChallenge.delayBeforeCheck=0"
+      - "--certificatesResolvers.{{ traefik_cert_resolver_provider }}.acme.dnsChallenge.resolvers={{ traefik_cert_resolver_dns_resolver }}"
+{% endi %}
+    environment:
+{% for value in traefik_environment %}
+      - {{ value }}
+{% endfor %}
     ports:
       - {{ traefik_port_http }}:80
       - {{ traefik_port_https }}:443
@@ -16,7 +32,7 @@ services:
       - "traefik.http.routers.dashboard.rule=Host(`{{ traefik_dashboard_subdomain }}.{{ traefik_domain }}`)"
       - "traefik.http.routers.dashboard.service=api@internal"
       - "traefik.http.routers.dashboard.tls=true"
-      - "traefik.http.routers.dashboard.tls.certresolver=le"
+      - "traefik.http.routers.dashboard.tls.certresolver={{ traefik_cert_resolver_provider }}"
 {% if traefik_dashboard_basicauth_enable %}
       - "traefik.http.routers.dashboard.middlewares=dashboardAuth"
       - "traefik.http.middlewares.dashboardAuth.basicauth.users={% for htpasswd in traefik_dashboard_basicauth_users %}{{ htpasswd }}{{ "," if not loop.last else "" }}{% endfor %}"
@@ -29,10 +45,14 @@ services:
       - "traefik.http.middlewares.httpsRedirect.redirectscheme.scheme=https"
       - "traefik.http.middlewares.httpsRedirect.redirectscheme.permanent=true"
 {% endif %}
+{% if traefik_acme_enable %}
+      - "traefik.http.routers.traefik-secure.entrypoints=https"
+      - "traefik.http.routers.traefik-secure.tls.certresolver={{ traefik_cert_resolver_provider }}"
+      - "traefik.http.routers.traefik-secure.tls.domains[0].main={{ traefik_domain }}"
+      - "traefik.http.routers.traefik-secure.tls.domains[0].sans=*.{{ traefik_domain }}"
+{% endif %}
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock"
-      - "{{ traefik_directory }}/traefik.toml:/traefik.toml"
-      - "{{ traefik_directory }}/conf.d:/conf.d"
 {% if traefik_acme_enable %}
       - "{{ traefik_directory }}/acme.json:/acme.json"
 {% endif %}
